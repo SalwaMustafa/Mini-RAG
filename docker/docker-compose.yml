@@ -27,3 +27,24 @@ networks:
 volumes:
   mongodata:
   
+
+
+
+
+# sudo docker stop $(sudo docker ps -aq) -> stop all containers
+# sudo docker rm $(sudo docker ps -aq)-> delete all containers 
+# sudo docker rmi $(sudo docker images -q)-> delete all images 
+# sudo docker volume rm $(sudo docker volume ls -q)-> delete all volumes 
+# sudo docker system prune --all  -> delete every thing not used
+# sudo docker compose up -d
+
+
+
+
+
+
+
+
+
+
+
