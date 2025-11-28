@@ -1,10 +1,14 @@
-fastapi==0.110.2
-uvicorn[standard]==0.29.0
-python-multipart==0.0.9
-python-dotenv==1.0.1
-pydantic-settings==2.2.1
-aiofiles==23.2.1
-langchain==0.1.20
-PyMuPDF==1.24.3
-motor==3.4.0
-pymongo==4.8.0
+fastapi == 0.118.0
+uvicorn[standard] == 0.37.0
+python-multipart == 0.0.20
+pydantic-settings == 2.11.0
+aiofiles == 24.1.0
+langchain == 0.3.27
+PyMuPDF == 1.26.5
+langchain-community == 0.3.31
+motor == 3.7.1
+pydantic-mongo == 3.1.0
+openai == 2.8.1
+cohere == 5.20.0
+google-generativeai == 0.8.5
+qdrant-client == 1.16.1
