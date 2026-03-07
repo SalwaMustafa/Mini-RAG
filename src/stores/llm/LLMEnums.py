@@ -12,11 +12,11 @@ class OpenAIEnums(Enum):
 
 
 class CohereEnums(Enum):
-    SYSTEM = "system"
-    USER = "user"   
-    ASSISTANT = "assistant"
     DOCUMENT = "search_document"
     QUERY = "search_query"
+    SYSTEM = "system"
+    USER = "user"
+    ASSISTANT = "chatbot"
 
 
 class DocumentTypeEnum(Enum):

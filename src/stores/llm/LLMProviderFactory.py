@@ -1,4 +1,4 @@
-from .providers import CoHereProvider, OpenAIProvider
+from .providers import CohereProvider, OpenAIProvider
 from .LLMEnums import LLMEnums
 
 class LLMProviderFactory:
@@ -19,7 +19,7 @@ class LLMProviderFactory:
             )
         
         if provider == LLMEnums.COHERE.value:
-            return CoHereProvider(
+            return CohereProvider(
                 api_key=self.config.COHERE_API_KEY,
                 default_input_max_characters=self.config.INPUT_DEFAULT_MAX_CHARACTERS,
                 default_generation_max_output_tokens=self.config.GENERATION_DEFAULT_MAX_TOKENS,
