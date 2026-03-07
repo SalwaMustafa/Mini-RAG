@@ -1,8 +1,9 @@
 from ..VectorDBInterface import VectorDBInterface
 import logging
-from ..VectorDBEnums import VectorDBEnums, DistanceMethodEnums
+from ..VectorDBEnums import DistanceMethodEnums
 from qdrant_client import QdrantClient, models
 from typing import List
+import uuid
 
 class QdrantDBProvider(VectorDBInterface):
 
@@ -19,7 +20,7 @@ class QdrantDBProvider(VectorDBInterface):
             self.distance_method = models.Distance.DOT
 
 
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger('uvicorn')
 
 
     def connect(self):
@@ -46,6 +47,8 @@ class QdrantDBProvider(VectorDBInterface):
         if self.is_collection_exists(collection_name=collection_name):
             return self.client.delete_collection(collection_name=collection_name)
         
+        self.logger.error(f"Collection {collection_name} does not exist.")
+        
 
     def create_collection(self, collection_name: str,
                           embedding_size: int,
@@ -61,8 +64,11 @@ class QdrantDBProvider(VectorDBInterface):
                         size=embedding_size,
                         distance=self.distance_method
                     )
+                    
                 )
             return True
+        
+        self.logger.error(f"Collection {collection_name} already exists.")
         return False
     
     def insert_one(self, collection_name: str, text: str, vector: list,
@@ -75,16 +81,10 @@ class QdrantDBProvider(VectorDBInterface):
          
         try:
             
-            _ = self.client.upload_records(
+            _ = self.client.upload_points(
                 collection_name=collection_name,
-                records=[
-                    models.Record(
-                        vector=vector,
-                        payload={
-                            "text": text, "metadata": metadata
-                        }
-                    )
-                ]
+                points=[models.PointStruct(id=record_id, vector=vector,
+                                            payload={"metadata":metadata, "text":text})]
             )
         except Exception as e:
             self.logger.error(f"Error while inserting batch: {e}")
@@ -102,7 +102,7 @@ class QdrantDBProvider(VectorDBInterface):
             metadatas = [None] * len(texts)
 
         if record_ids is None:
-            record_ids = [None] * len(texts)
+            record_ids = list(range(0 , len(texts)))
 
         for i in range(0, len(texts), batch_size):
             batch_end = i + batch_size
@@ -110,10 +110,13 @@ class QdrantDBProvider(VectorDBInterface):
             batch_texts = texts[i:batch_end]
             batch_vectors = vectors[i:batch_end]
             batch_metadatas = metadatas[i:batch_end]
+            #batch_record_ids = record_ids[i:batch_end]
+            batch_record_ids = [uuid.UUID(bytes=uuid.uuid5(uuid.NAMESPACE_DNS, str(mongo_id)).bytes) for mongo_id in record_ids[i:batch_end]] 
            
 
             batch_records = [
-                models.Record(
+                models.PointStruct(
+                    id = batch_record_ids[j],
                     vector=batch_vectors[j],
                     payload={
                         "text": batch_texts[j],
@@ -123,24 +126,27 @@ class QdrantDBProvider(VectorDBInterface):
                 for j in range(len(batch_texts))
             ]
 
-            try:
-                _ = self.client.upload_records(
-                    collection_name=collection_name,
-                    records=batch_records,
-                )
-            except Exception as e:
-                self.logger.error(f"Error while inserting batch: {e}")
-                return False
+            if batch_records:
+
+                try:
+                    _ = self.client.upload_points(
+                        collection_name=collection_name,
+                        points=batch_records,
+                    )
+                except Exception as e:
+                    self.logger.error(f"Error while inserting batch: {e}")
+                    return False
             
         return True
     
 
     def search_by_vector(self, collection_name: str, vector: list, limit: int = 5):
 
-        return self.client.search(
+        return self.client.query_points(
             collection_name=collection_name,
-            query_vector=vector,
-            limit=limit
+            query=vector,
+            limit=limit,
+            #score_threshold=0.1
         )
         
         
