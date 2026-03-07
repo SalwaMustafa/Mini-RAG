@@ -52,6 +52,15 @@ class ProcessController(BaseController):
             chunk_size= chunk_size,
             chunk_overlap = overlap_size,
             length_function = len,
+            separators = [
+                            "\n\n",
+                            "\n",
+                            "۔",
+                            ".",
+                            "!",
+                            "؟",
+                            " "
+                        ]
 
         )
 
