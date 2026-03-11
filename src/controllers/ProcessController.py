@@ -56,7 +56,8 @@ class ProcessController(BaseController):
                             "\n\n",
                             "\n",
                             "۔",
-                            ".",
+                            "،",
+                            ". ",
                             "!",
                             "؟",
                             " "

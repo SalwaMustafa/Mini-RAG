@@ -169,7 +169,7 @@ async def search_index(request: Request, project_id: str, search_request: Search
             status_code = status.HTTP_200_OK,
             content = {
                 "signal":  ResponseSignal.VECTOR_DB_SEARCH_SUCCESS.value,
-                "results" : results,
+                "results" : [result.dict() for result in results]
             }
         )
 
